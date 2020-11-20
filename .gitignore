@@ -16,3 +16,5 @@ data_in/metal/
 data_in/pop/
 data_in/reggae/
 data_in/rock/
+!/codes/utils.py
+.idea/other.xml
