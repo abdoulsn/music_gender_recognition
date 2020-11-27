@@ -1,5 +1,8 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 import numpy as np
+import tensorflow.keras as keras
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
@@ -13,10 +16,6 @@ PATIENCE = 5
 LEARNING_RATE = 0.001
 
 
-X_train, y_train, X_validation, y_validation, X_test, y_test = echantillons(DATA_PATH, test_size=0.1, validation_size=0.1)
-
-
-
 def build_model(input_shape, loss="sparse_categorical_crossentropy", learning_rate=0.0001):
     """Build neural network using keras.
 
@@ -27,41 +26,29 @@ def build_model(input_shape, loss="sparse_categorical_crossentropy", learning_ra
     :return model: TensorFlow model
     """
 
-    # build network architecture using convolutional layers
-    model = tf.keras.models.Sequential()
+    # build network topology
+    model = keras.Sequential([
 
-    # 1st conv layer
-    model.add(tf.keras.layers.Conv2D(64, (3, 3), activation='relu', input_shape=input_shape,
-                                     kernel_regularizer=tf.keras.regularizers.l2(0.001)))
-    model.add(tf.keras.layers.BatchNormalization())
-    model.add(tf.keras.layers.MaxPooling2D((3, 3), strides=(2,2), padding='same'))
+        # input layer
+        # keras.layers.Flatten(input_shape=input_shape),
 
-    # 2nd conv layer
-    model.add(tf.keras.layers.Conv2D(32, (3, 3), activation='relu',
-                                     kernel_regularizer=tf.keras.regularizers.l2(0.001)))
-    model.add(tf.keras.layers.BatchNormalization())
-    model.add(tf.keras.layers.MaxPooling2D((3, 3), strides=(2,2), padding='same'))
+        # 1st dense layer
+        keras.layers.Dense(512, input_shape=input_shape, activation='relu'),
 
-    # 3rd conv layer
-    model.add(tf.keras.layers.Conv2D(32, (2, 2), activation='relu',
-                                     kernel_regularizer=tf.keras.regularizers.l2(0.001)))
-    model.add(tf.keras.layers.BatchNormalization())
-    model.add(tf.keras.layers.MaxPooling2D((2, 2), strides=(2,2), padding='same'))
+        # 2nd dense layer
+        keras.layers.Dense(256, activation='relu'),
 
-    # flatten output and feed into dense layer
-    model.add(tf.keras.layers.Flatten())
-    model.add(tf.keras.layers.Dense(64, activation='relu'))
-    tf.keras.layers.Dropout(0.3)
+        # 3rd dense layer
+        keras.layers.Dense(64, activation='relu'),
 
-    # softmax output layer
-    model.add(tf.keras.layers.Dense(10, activation='softmax'))
-
-    optimiser = tf.optimizers.Adam(learning_rate=learning_rate)
+        # output layer
+        keras.layers.Dense(10, activation='softmax')
+    ])
 
     # compile model
+    optimiser = keras.optimizers.Adam(learning_rate=0.001)
     model.compile(optimizer=optimiser,
-                  loss=loss,
-                  metrics=["accuracy"])
+                  loss=loss, metrics=['accuracy'])
 
     # print model parameters on console
     model.summary()
@@ -83,15 +70,15 @@ def train(model, epochs, batch_size, patience, X_train, y_train, X_validation, y
     :return history: Training history
     """
 
-    earlystop_callback = tf.keras.callbacks.EarlyStopping(monitor="accuracy", min_delta=0.001, patience=patience)
+    # earlystop_callback = tf.keras.callbacks.EarlyStopping(monitor="accuracy", min_delta=0.001, patience=patience)
 
     # train model
     history = model.fit(X_train,
                         y_train,
                         epochs=epochs,
                         batch_size=batch_size,
-                        validation_data=(X_validation, y_validation),
-                        callbacks=[earlystop_callback])
+                        validation_data=(X_validation, y_validation))
+                        # callbacks=[earlystop_callback])
     return history
 
 
@@ -124,10 +111,19 @@ def plot_history(history):
 
 def main():
     # generate train, validation and test sets
-    X_train, y_train, X_validation, y_validation, X_test, y_test = prepare_dataset(DATA_PATH)
+    X, y = load_data("../data_out/rawdata.csv")
+    X_train, y_train, X_validation, y_validation, X_test, y_test = echantillons(DATA_PATH, test_size=0.1,
+                                                                                validation_size=0.1)
+    y_train = y_train.astype('category')
+    y_train = y_train.cat.codes
 
+    y_test = y_test.astype('category')
+    y_test = y_test.cat.codes
+
+    y_validation = y_validation.astype('category')
+    y_validation = y_validation.cat.codes
     # create network
-    input_shape = (X_train.shape[1], X_train.shape[2], 1)
+    input_shape =  (X_train.shape[1],)
     model = build_model(input_shape, learning_rate=LEARNING_RATE)
 
     # train network
