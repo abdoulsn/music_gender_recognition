@@ -3,6 +3,7 @@
 
 import numpy as np
 import tensorflow.keras as keras
+from sklearn.metrics import confusion_matrix
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
@@ -79,7 +80,7 @@ def train(model, epochs, batch_size, patience, X_train, y_train, X_validation, y
                         batch_size=batch_size,
                         validation_data=(X_validation, y_validation),
                         callbacks=[earlystop_callback])
-    return history
+    return history, model
 
 
 def plot_history(history):
@@ -124,7 +125,8 @@ def main():
     model = build_model(input_shape, learning_rate=LEARNING_RATE)
 
     # train network
-    history, preds = train(model, EPOCHS, BATCH_SIZE, PATIENCE, X_train, y_train, X_validation, y_validation)
+    history, model = train(model, EPOCHS, BATCH_SIZE, PATIENCE, X_train, y_train, X_validation, y_validation)
+
 
     # plot accuracy/loss for training/validation set as a function of the epochs
     plot_history(history)
@@ -132,7 +134,12 @@ def main():
     # evaluate network on test set
     test_loss, test_acc = model.evaluate(X_validation, y_validation)
     print("\nTest loss: {}, test accuracy: {}".format(test_loss, 100*test_acc))
+    pred = model.predict(X_validation)
 
+    cm = confusion_matrix(y_validation,pred)
+    np.set_printoptions(precision=2)
+    print("La matrice de confusion")
+    print(cm)
     # save model
     model.save(SAVED_MODEL_PATH)
 
