@@ -11,8 +11,8 @@ from prepare_data import *
 DATA_PATH = "../data_out/rawdata.csv"
 SAVED_MODEL_PATH = "model.h5"
 EPOCHS = 100
-BATCH_SIZE = 2
-PATIENCE = 5
+BATCH_SIZE = 16
+PATIENCE = 10
 LEARNING_RATE = 0.001
 
 
