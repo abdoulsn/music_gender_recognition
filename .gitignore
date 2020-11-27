@@ -18,6 +18,5 @@ data_in/reggae/
 data_in/rock/
 !/codes/utils.py
 .idea/other.xml
-!/codes/modele_de_cnn.py
 .ipynb_checkpoints/
 Untitled.ipynb
