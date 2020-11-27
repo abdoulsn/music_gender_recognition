@@ -136,10 +136,10 @@ def main():
     print("\nTest loss: {}, test accuracy: {}".format(test_loss, 100*test_acc))
     pred = model.predict(X_validation)
 
-    cm = confusion_matrix(y_validation,pred)
-    np.set_printoptions(precision=2)
-    print("La matrice de confusion")
-    print(cm)
+    # cm = confusion_matrix(y_validation,pred)
+    # np.set_printoptions(precision=2)
+    # print("La matrice de confusion")
+    print(pred)
     # save model
     model.save(SAVED_MODEL_PATH)
 
