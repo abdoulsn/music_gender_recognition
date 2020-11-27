@@ -1,3 +1,10 @@
+
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+
 def build_model(*args, loss="", learning_rate=0.0001):
     """Contruire un modele SVM avec scikitlearn.
 
