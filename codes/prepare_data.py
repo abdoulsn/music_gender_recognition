@@ -21,7 +21,7 @@ def load_data(data_path):
     return X, y
 
 
-def echantillons(data_path, test_size=0.2, validation_size=0.2):
+def echantillons(data_path, test_size=0.2):
     """Creation train, validation et test.
 
      : param data_path (str): chemin vers le fichier csv contenant des données
@@ -40,11 +40,11 @@ def echantillons(data_path, test_size=0.2, validation_size=0.2):
     X, y = load_data(data_path)
     # Extraction train, validation, test split
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
-    X_train, X_validation, y_train, y_validation = train_test_split(X_train, y_train, test_size=validation_size)
+    # X_train, X_validation, y_train, y_validation = train_test_split(X_train, y_train, test_size=validation_size)
 
     print("\n")
     print("Echantillons X_train, y_train, X_validation, y_validation, X_test, y_test crées.")
-    return X_train, y_train, X_validation, y_validation, X_test, y_test
+    return X_train, y_train, X_test, y_test
 
 
 if __name__ == "__main__":

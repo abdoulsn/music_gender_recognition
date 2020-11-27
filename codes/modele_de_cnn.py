@@ -112,28 +112,25 @@ def plot_history(history):
 def main():
     # generate train, validation and test sets
     X, y = load_data("../data_out/rawdata.csv")
-    X_train, y_train, X_validation, y_validation, X_test, y_test = echantillons(DATA_PATH, test_size=0.1,
-                                                                                validation_size=0.1)
+    X_train, y_train, X_validation, y_validation = echantillons(DATA_PATH, test_size=0.1)
     y_train = y_train.astype('category')
     y_train = y_train.cat.codes
 
-    y_test = y_test.astype('category')
-    y_test = y_test.cat.codes
-
     y_validation = y_validation.astype('category')
     y_validation = y_validation.cat.codes
+
     # create network
     input_shape =  (X_train.shape[1],)
     model = build_model(input_shape, learning_rate=LEARNING_RATE)
 
     # train network
-    history = train(model, EPOCHS, BATCH_SIZE, PATIENCE, X_train, y_train, X_validation, y_validation)
+    history, preds = train(model, EPOCHS, BATCH_SIZE, PATIENCE, X_train, y_train, X_validation, y_validation)
 
     # plot accuracy/loss for training/validation set as a function of the epochs
     plot_history(history)
 
     # evaluate network on test set
-    test_loss, test_acc = model.evaluate(X_test, y_test)
+    test_loss, test_acc = model.evaluate(X_validation, y_validation)
     print("\nTest loss: {}, test accuracy: {}".format(test_loss, 100*test_acc))
 
     # save model
