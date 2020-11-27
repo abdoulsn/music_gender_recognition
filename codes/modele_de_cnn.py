@@ -10,8 +10,8 @@ from prepare_data import *
 
 DATA_PATH = "../data_out/rawdata.csv"
 SAVED_MODEL_PATH = "model.h5"
-EPOCHS = 20
-BATCH_SIZE = 8
+EPOCHS = 100
+BATCH_SIZE = 2
 PATIENCE = 5
 LEARNING_RATE = 0.001
 
@@ -70,15 +70,15 @@ def train(model, epochs, batch_size, patience, X_train, y_train, X_validation, y
     :return history: Training history
     """
 
-    # earlystop_callback = tf.keras.callbacks.EarlyStopping(monitor="accuracy", min_delta=0.001, patience=patience)
+    earlystop_callback = tf.keras.callbacks.EarlyStopping(monitor="accuracy", min_delta=0.001, patience=patience)
 
     # train model
     history = model.fit(X_train,
                         y_train,
                         epochs=epochs,
                         batch_size=batch_size,
-                        validation_data=(X_validation, y_validation))
-                        # callbacks=[earlystop_callback])
+                        validation_data=(X_validation, y_validation),
+                        callbacks=[earlystop_callback])
     return history
 
 
