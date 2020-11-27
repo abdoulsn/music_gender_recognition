@@ -6,92 +6,70 @@ import tensorflow.keras as keras
 from sklearn.metrics import confusion_matrix
 import tensorflow as tf
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
 from prepare_data import *
 
 DATA_PATH = "../data_out/rawdata.csv"
 SAVED_MODEL_PATH = "model.h5"
 EPOCHS = 100
-BATCH_SIZE = 16
 PATIENCE = 10
 LEARNING_RATE = 0.001
 
 
 def build_model(input_shape, loss="sparse_categorical_crossentropy", learning_rate=0.0001):
-    """Build neural network using keras.
+    """Construction d'un réseau neuronal à l'aide de keras.
 
-    :param input_shape (tuple): Shape of array representing a sample train. E.g.: (44, 13, 1)
-    :param loss (str): Loss function to use
-    :param learning_rate (float):
-
-    :return model: TensorFlow model
+    : param input_shape (tuple): Forme du df représentant un data train.
+    : param loss (str): fonction de perte à utiliser
+    : param learning_rate (float):
+    : modèle de retour: modèle TensorFlow
     """
 
-    # build network topology
+    # LE réseau
     model = keras.Sequential([
 
-        # input layer
-        # keras.layers.Flatten(input_shape=input_shape),
-
-        # 1st dense layer
         keras.layers.Dense(512, input_shape=input_shape, activation='relu'),
-
-        # 2nd dense layer
         keras.layers.Dense(256, activation='relu'),
-
-        # 3rd dense layer
         keras.layers.Dense(64, activation='relu'),
-
-        # output layer
         keras.layers.Dense(10, activation='softmax')
     ])
 
-    # compile model
+    # compiler le modele
     optimiser = keras.optimizers.Adam(learning_rate=0.001)
     model.compile(optimizer=optimiser,
                   loss=loss, metrics=['accuracy'])
-
-    # print model parameters on console
+    # print summary du modèle
     model.summary()
 
     return model
 
 
-def train(model, epochs, batch_size, patience, X_train, y_train, X_validation, y_validation):
-    """Trains model
+def train(model, epochs, patience, X_train, y_train, X_validation, y_validation):
+    """ apprentisage
+    : param epochs (int): nbre d'itérations d'apprentissage
+    : param patience (int): Nombre d'époques à attendre avant l'arrêt anticipé, s'il n'y a pas d'amélioration de la précision
+    : param X_train (ndarray): Entrées pour la df X
+    : param y_train (ndarray): Cibles pour la df Y
+    : param X_validation (ndarray): Entrées pour l'ensemble de validation
+    : param y_validation (ndarray): Cibles pour l'ensemble de validation
 
-    :param epochs (int): Num training epochs
-    :param batch_size (int): Samples per batch
-    :param patience (int): Num epochs to wait before early stop, if there isn't an improvement on accuracy
-    :param X_train (ndarray): Inputs for the train set
-    :param y_train (ndarray): Targets for the train set
-    :param X_validation (ndarray): Inputs for the validation set
-    :param y_validation (ndarray): Targets for the validation set
-
-    :return history: Training history
+    : return history et model: historique d'entraînement
     """
-
     earlystop_callback = tf.keras.callbacks.EarlyStopping(monitor="accuracy", min_delta=0.001, patience=patience)
 
     # train model
-    history = model.fit(X_train,
-                        y_train,
-                        epochs=epochs,
-                        batch_size=batch_size,
+    history = model.fit(X_train, y_train, epochs=epochs,
                         validation_data=(X_validation, y_validation),
                         callbacks=[earlystop_callback])
     return history, model
 
 
 def plot_history(history):
-    """Plots accuracy/loss for training/validation set as a function of the epochs
-
-    :param history: Training history of model
+    """Plots accuracy/loss pour training/validation
+    :param history
     :return:
     """
 
     fig, axs = plt.subplots(2)
-
     # create accuracy subplot
     axs[0].plot(history.history["accuracy"], label="accuracy")
     axs[0].plot(history.history['val_accuracy'], label="val_accuracy")
@@ -110,40 +88,36 @@ def plot_history(history):
     plt.show()
 
 
-def main():
+def run_model():
     # generate train, validation and test sets
-    X, y = load_data("../data_out/rawdata.csv")
-    X_train, y_train, X_validation, y_validation = echantillons(DATA_PATH, test_size=0.1)
+    x_train, y_train, x_validation, y_validation = echantillons(DATA_PATH, test_size=0.1)
     y_train = y_train.astype('category')
     y_train = y_train.cat.codes
-
     y_validation = y_validation.astype('category')
     y_validation = y_validation.cat.codes
 
-    # create network
-    input_shape =  (X_train.shape[1],)
+    # creation du réseau
+    input_shape =  (x_train.shape[1],)
     model = build_model(input_shape, learning_rate=LEARNING_RATE)
-
-    # train network
-    history, model = train(model, EPOCHS, BATCH_SIZE, PATIENCE, X_train, y_train, X_validation, y_validation)
-
-
-    # plot accuracy/loss for training/validation set as a function of the epochs
+    # apprentisage network
+    history, model = train(model, EPOCHS, PATIENCE, x_train, y_train, x_validation, y_validation)
+    # plot accuracy/loss
     plot_history(history)
 
-    # evaluate network on test set
-    test_loss, test_acc = model.evaluate(X_validation, y_validation)
+    # evaluation sur la df validation
+    test_loss, test_acc = model.evaluate(x_validation, y_validation)
     print("\nTest loss: {}, test accuracy: {}".format(test_loss, 100*test_acc))
-    pred = model.predict(X_validation)
-
+    pred = model.predict(x_validation)
+    preds = pd.DataFrame(pred)
+    preds.to_csv("../data_out/preds.csv")
     # cm = confusion_matrix(y_validation,pred)
     # np.set_printoptions(precision=2)
     # print("La matrice de confusion")
-    print(pred)
-    # save model
+
+    # enregistré le modèle
     model.save(SAVED_MODEL_PATH)
 
 
 if __name__ == "__main__":
-    main()
+    run_model()
 
