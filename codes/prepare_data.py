@@ -28,7 +28,7 @@ def echantillons(data_path, test_size=0.2):
      : param test_size (flaot): pourcentage du jeu de données utilisé pour les tests
      : param validation_size (float): Pourcentage de rame utilisé pour la validation croisée
 
-     : return X_train (dataframe): Entrées pour la rame
+     : return x_train (dataframe): Entrées pour la rame
      : return y_train (dataframe): Cibles pour le train
      : return X_validation (dataframe): Entrées pour l'ensemble de validation
      : return y_validation (dataframe): Cibles pour l'ensemble de validation
@@ -40,10 +40,10 @@ def echantillons(data_path, test_size=0.2):
     X, y = load_data(data_path)
     # Extraction train, validation, test split
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
-    # X_train, X_validation, y_train, y_validation = train_test_split(X_train, y_train, test_size=validation_size)
+    # x_train, X_validation, y_train, y_validation = train_test_split(x_train, y_train, test_size=validation_size)
 
     print("\n")
-    print("Echantillons X_train, y_train, X_validation, y_validation, X_test, y_test crées.")
+    print("Echantillons x_train, y_train, X_validation, y_validation, X_test, y_test crées.")
     return X_train, y_train, X_test, y_test
 
 

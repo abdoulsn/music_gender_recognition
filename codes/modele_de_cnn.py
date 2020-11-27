@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+import pandas as pd
 import tensorflow.keras as keras
 from sklearn.metrics import confusion_matrix
 import tensorflow as tf
@@ -10,7 +11,7 @@ from prepare_data import *
 
 DATA_PATH = "../data_out/rawdata.csv"
 SAVED_MODEL_PATH = "model.h5"
-EPOCHS = 100
+EPOCHS = 300
 PATIENCE = 10
 LEARNING_RATE = 0.001
 
@@ -43,22 +44,23 @@ def build_model(input_shape, loss="sparse_categorical_crossentropy", learning_ra
     return model
 
 
-def train(model, epochs, patience, X_train, y_train, X_validation, y_validation):
+def train(model, epochs, patience, x_train, y_train, x_validation, y_validation):
     """ apprentisage
     : param epochs (int): nbre d'itérations d'apprentissage
-    : param patience (int): Nombre d'époques à attendre avant l'arrêt anticipé, s'il n'y a pas d'amélioration de la précision
-    : param X_train (ndarray): Entrées pour la df X
+    : param patience (int): Nombre d'époques à attendre avant l'arrêt anticipé, s'il n'y a pas d'amélioration de la
+        précision
+    : param x_train (ndarray): Entrées pour la df X
     : param y_train (ndarray): Cibles pour la df Y
     : param X_validation (ndarray): Entrées pour l'ensemble de validation
     : param y_validation (ndarray): Cibles pour l'ensemble de validation
 
     : return history et model: historique d'entraînement
     """
-    earlystop_callback = tf.keras.callbacks.EarlyStopping(monitor="accuracy", min_delta=0.001, patience=patience)
+    earlystop_callback = tf.keras.callbacks.EarlyStopping(monitor="accuracy", min_delta=0.0001, patience=patience)
 
     # train model
-    history = model.fit(X_train, y_train, epochs=epochs,
-                        validation_data=(X_validation, y_validation),
+    history = model.fit(x_train, y_train, epochs=epochs,
+                        validation_data=(x_validation, y_validation),
                         callbacks=[earlystop_callback])
     return history, model
 
@@ -97,7 +99,7 @@ def run_model():
     y_validation = y_validation.cat.codes
 
     # creation du réseau
-    input_shape =  (x_train.shape[1],)
+    input_shape = (x_train.shape[1],)
     model = build_model(input_shape, learning_rate=LEARNING_RATE)
     # apprentisage network
     history, model = train(model, EPOCHS, PATIENCE, x_train, y_train, x_validation, y_validation)
@@ -120,4 +122,3 @@ def run_model():
 
 if __name__ == "__main__":
     run_model()
-

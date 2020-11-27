@@ -20,7 +20,7 @@ def build_model(*args, loss="", learning_rate=0.0001):
 
 def train(model, X_train, y_train, X_validation, y_validation):
     """Trains du modèle
-     : param X_train (dataframe): Entrées pour
+     : param x_train (dataframe): Entrées pour
      : param y_train (dataframe): Cibles pour
      : param X_validation (dataframe): Entrées pour l'ensemble de validation
      : param y_validation (dataframe): Cibles pour l'ensemble de validation
