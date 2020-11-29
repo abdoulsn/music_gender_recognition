@@ -96,7 +96,6 @@ def plot_history(history):
     axs[1].set_ylabel("Loss")
     axs[1].legend(loc="upper right")
     axs[1].set_title("Loss evaluation")
-
     plt.show()
 
 
@@ -121,7 +120,7 @@ def run_model():
     input_shape=x_train.shape[1]
     model = build_model(input_shape, learning_rate=LEARNING_RATE)
     # apprentisage network
-    history, model = train(model, EPOCHS, PATIENCE, x_train, y_train) #, x_validation, y_validation)
+    history, model = train(model, EPOCHS, PATIENCE, x_train, y_train)
     # plot accuracy/loss
     plot_history(history)
 
