@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from prepare_data import *
 
 DATA_PATH = "../data_out/rawdata.csv"
-SAVED_MODEL_PATH = "model.h5"
+SAVED_MODEL_PATH = "../data_out/modeles/nnet.h5"
 EPOCHS = 300
 PATIENCE = 10
 LEARNING_RATE = 0.001
@@ -28,8 +28,12 @@ def build_model(input_shape, loss="sparse_categorical_crossentropy", learning_ra
     # LE réseau
     model = keras.Sequential([
 
-        keras.layers.Dense(512, input_shape=input_shape, activation='relu'),
+        keras.layers.Dense(1024, input_shape=input_shape, activation='relu'),
+        keras.layers.Dropout(0.3),
+        keras.layers.Dense(512, activation='relu'),
+        keras.layers.Dropout(0.3),
         keras.layers.Dense(256, activation='relu'),
+        keras.layers.Dropout(0.3),
         keras.layers.Dense(64, activation='relu'),
         keras.layers.Dense(10, activation='softmax')
     ])
@@ -108,7 +112,7 @@ def run_model():
 
     # evaluation sur la df validation
     test_loss, test_acc = model.evaluate(x_validation, y_validation)
-    print("\nTest loss: {}, test accuracy: {}".format(test_loss, 100*test_acc))
+    print("\nTest loss: {}, test accuracy: {}".format(test_loss, test_acc))
     pred = model.predict(x_validation)
     preds = pd.DataFrame(pred)
     preds.to_csv("../data_out/preds.csv")
