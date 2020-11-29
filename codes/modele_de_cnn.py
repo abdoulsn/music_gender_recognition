@@ -109,7 +109,7 @@ def run_model():
     y_validation = y_validation.cat.codes
     # pour le sparse cat cross_ent
     y_train = tf.keras.utils.to_categorical(y_train,10,'int')
-    y_validation = tf.keras.utils.to_categorical(y_train,10,'int')
+    y_validation = tf.keras.utils.to_categorical(y_validation,10,'int')
 
     # creation du réseau
     input_shape=x_train.shape[1]
