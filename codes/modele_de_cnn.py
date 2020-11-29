@@ -3,6 +3,8 @@
 
 import numpy as np
 import pandas as pd
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Dense,Dropout,Input
 import tensorflow.keras as keras
 from sklearn.metrics import confusion_matrix
 import tensorflow as tf
@@ -16,7 +18,7 @@ PATIENCE = 10
 LEARNING_RATE = 0.001
 
 
-def build_model(input_shape, loss="sparse_categorical_crossentropy", learning_rate=0.0001):
+def build_model(input_shape, loss="categorical_crossentropy", learning_rate=0.0001):
     """Construction d'un réseau neuronal à l'aide de keras.
 
     : param input_shape (tuple): Forme du df représentant un data train.
@@ -26,22 +28,25 @@ def build_model(input_shape, loss="sparse_categorical_crossentropy", learning_ra
     """
 
     # LE réseau
-    model = keras.Sequential([
 
-        keras.layers.Dense(1024, input_shape=input_shape, activation='relu'),
-        keras.layers.Dropout(0.3),
-        keras.layers.Dense(512, activation='relu'),
-        keras.layers.Dropout(0.3),
-        keras.layers.Dense(256, activation='relu'),
-        keras.layers.Dropout(0.3),
-        keras.layers.Dense(64, activation='relu'),
-        keras.layers.Dense(10, activation='softmax')
-    ])
+    inp=Input(shape=(input_shape,))
+    model = Dense(500,activation='relu')(inp)
+    model = Dropout(0.3)(model)
+    model = Dense(8000,activation='relu')(model)
+    model = Dropout(0.2)(model)
+    model = Dense(4000,activation='relu')(model)
+    model = Dropout(0.2)(model)
+    model = Dense(2000,activation='relu')(model)
+    model = Dropout(0.2)(model)
+    model = Dense(1000,activation='relu')(model)
+    model = Dense(500,activation='relu')(model)
+    model = Dense(10,activation='softmax')(model)
 
-    # compiler le modele
-    optimiser = keras.optimizers.Adam(learning_rate=0.001)
-    model.compile(optimizer=optimiser,
-                  loss=loss, metrics=['accuracy'])
+    model = Model(inputs=inp,outputs=model)
+    model.compile(optimizer='adam',
+                  loss=loss,
+                  metrics=['accuracy'])
+
     # print summary du modèle
     model.summary()
 
@@ -64,8 +69,9 @@ def train(model, epochs, patience, x_train, y_train, x_validation, y_validation)
 
     # train model
     history = model.fit(x_train, y_train, epochs=epochs,
-                        validation_data=(x_validation, y_validation),
+                        validation_split = .05,
                         callbacks=[earlystop_callback])
+
     return history, model
 
 
@@ -101,9 +107,12 @@ def run_model():
     y_train = y_train.cat.codes
     y_validation = y_validation.astype('category')
     y_validation = y_validation.cat.codes
+    # pour le sparse cat cross_ent
+    y_train = tf.keras.utils.to_categorical(y_train,10,'int')
+    y_validation = tf.keras.utils.to_categorical(y_train,10,'int')
 
     # creation du réseau
-    input_shape = (x_train.shape[1],)
+    input_shape=x_train.shape[1]
     model = build_model(input_shape, learning_rate=LEARNING_RATE)
     # apprentisage network
     history, model = train(model, EPOCHS, PATIENCE, x_train, y_train, x_validation, y_validation)
