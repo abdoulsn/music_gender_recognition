@@ -2,123 +2,35 @@ import soundfile
 import librosa
 import numpy as np
 import pickle
+import itertools
+from matplotlib import pyplot as plt
 
-def getfeature(file_name):
+# Helper to plot confusion matrix -- from Scikit-learn website
+def plot_confusion_matrix(cm, classes,
+                          normalize=False,
+                          title='Confusion matrix',
+                          cmap=plt.cm.Blues):
     """
-    input: le fichier audio
-    output: feautures 
+    This function prints and plots the confusion matrix.
+    Normalization can be applied by setting `normalize=True`.
     """
-    
-    result = np.array([])
-    X, sample_rate = librosa.load(file_name)
-    stft = np.abs(librosa.stft(X))
-    mfccs = np.mean(librosa.feature.mfcc(y=X, sr=sample_rate, n_mfcc=13, ).T, axis=0)
-    result = np.hstack((result, mfccs))      
-    chroma = np.mean(librosa.feature.chroma_stft(S=stft, sr=sample_rate).T,axis=0)
-    result = np.hstack((result, chroma))
-    zcr = np.mean(librosa.feature.zero_crossing_rate(y=X).T,axis=0)
-    
-    return  mfccs, chroma, zcr, result
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
 
-def parse_audio_files(*musicspaths):
-    """
-    
-    """
-    features, labels = np.empty((0, 26)), np.empty(0)
-    # labels = []
-    for filename in musics:
-        try:
-            mfccs, chroma, zcr = getfeature(filename)
-        except Exception as e:
-            print("Probleme avec le fichier: ", filename)
-            continue
-        ext_features = np.hstack([mfccs, chroma, zcr])
-        features = np.vstack([features, ext_features])
-        labels = np.append(labels, [filename][0].split("/")[3].split(".")[0])
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45)
+    plt.yticks(tick_marks, classes)
 
-    return np.array(features), np.array(labels)
+    fmt = '.2f' if normalize else 'd'
+    thresh = cm.max() / 2.
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j, i, format(cm[i, j], fmt),
+                 horizontalalignment="center",
+                 color="white" if cm[i, j] > thresh else "black")
 
-
-genres_musics = {'blues',
-                'classical',
-                'country',
-                'disco',
-                'hiphop',
-                'jazz',
-                'metal',
-                'pop',
-                'reggae',
-                'rock'}
-
-
-def get_label(audio_config):
-    """Docs
-    
-    """
-    features = ["mfcc", "zcr"]
-    label = ""
-    for feature in features:
-        if audio_config[feature]:
-            label += f"{feature}-"
-    return label.rstrip("-")
-
-
-
-def get_first_letters(genres):
-    return "".join(sorted([ e[0].upper() for e in emotions ]))
-
-
-def extract_feature(file_name, **kwargs):
-    """
-    Extraction des features à partir des fichiers audios `file_name`
-        Features supported:
-            - MFCC (mfcc)
-            - zcr
-        e.g:
-        `features = extract_feature(path, mel=True, mfcc=True)`
-    """
-    mfcc = kwargs.get("mfcc")
-    # chroma = kwargs.get("chroma")
-    zcr = kwargs.get("zcr")
-
-    
-    with soundfile.SoundFile(file_name) as sound_file:
-        X = sound_file.read(dtype="float32")
-        sample_rate = sound_file.samplerate
-        if chroma or contrast:
-            stft = np.abs(librosa.stft(X))
-        result = np.array([])
-        if mfcc:
-            mfccs = np.mean(librosa.feature.mfcc(y=X, sr=sample_rate, n_mfcc=13).T, axis=0)
-            result = np.hstack((result, mfccs))
-        if chroma:
-            chroma = np.mean(librosa.feature.chroma_stft(S=stft, sr=sample_rate).T,axis=0)
-            result = np.hstack((result, chroma))
-        # if mel:
-        #     mel = np.mean(librosa.feature.melspectrogram(X, sr=sample_rate).T,axis=0)
-        #     result = np.hstack((result, mel))
-        # if contrast:
-        #     contrast = np.mean(librosa.feature.spectral_contrast(S=stft, sr=sample_rate).T,axis=0)
-        #     result = np.hstack((result, contrast))
-        # if tonnetz:
-        #     tonnetz = np.mean(librosa.feature.tonnetz(y=librosa.effects.harmonic(X), sr=sample_rate).T,axis=0)
-        #     result = np.hstack((result, tonnetz))
-    return result
-
-
-
-
-def get_audio_config(features_list):
-    """
-    Converts a list of features into a dictionary understandable by
-    `data_extractor.AudioExtractor` class
-    """
-    audio_config = {'mfcc': False, 'chroma': False, 'mel': False, 'contrast': False, 'tonnetz': False}
-    for feature in features_list:
-        if feature not in audio_config:
-            raise TypeError(f"Feature passed: {feature} is not recognized.")
-        audio_config[feature] = True
-    return audio_config
-
-
-    
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+    plt.show()   
