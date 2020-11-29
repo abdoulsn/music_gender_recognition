@@ -126,10 +126,8 @@ def run_model():
     print("\nTest loss: {}, test accuracy: {}".format(test_loss, test_acc))
     pred = model.predict(x_validation)
     preds = pd.DataFrame(pred)
-    preds.to_csv("../data_out/preds.csv")
-    # cm = confusion_matrix(y_validation,pred)
-    # np.set_printoptions(precision=2)
-    # print("La matrice de confusion")
+    preds.to_csv("../data_out/preds_nnet.csv")
+
 
     # enregistré le modèle
     model.save(SAVED_MODEL_PATH)
