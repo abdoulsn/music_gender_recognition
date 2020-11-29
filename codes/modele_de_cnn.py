@@ -9,7 +9,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from prepare_data import *
 
-DATA_PATH = "../data_out/rawdata.csv"
+DATA_PATH = "../data_out/rawdata2.csv"
 SAVED_MODEL_PATH = "../data_out/modeles/nnet.h5"
 EPOCHS = 300
 PATIENCE = 20
@@ -101,6 +101,12 @@ def plot_history(history):
 def run_model():
     # generate train, validation and test sets
     x_train, y_train, x_validation, y_validation = echantillons(DATA_PATH, test_size=0.1)
+    # Normalisation avec stdslr
+    from sklearn.preprocessing import StandardScaler
+    scaler = StandardScaler()
+    x_train = scaler.fit_transform(x_train)
+    #Appliqué le meme sur le test aussi
+    x_validation = scaler.transform(x_validation)
     y_train = y_train.astype('category')
     y_train = y_train.cat.codes
     y_validation = y_validation.astype('category')
