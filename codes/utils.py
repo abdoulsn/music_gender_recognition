@@ -4,6 +4,7 @@
 import soundfile
 import librosa
 import numpy as np
+import pandas as pd
 import pickle
 import itertools
 from matplotlib import pyplot as plt
@@ -11,7 +12,7 @@ from matplotlib import pyplot as plt
 # Helper to plot confusion matrix -- from Scikit-learn website
 def plot_confusion_matrix(cm, classes,
                           normalize=False,
-                          title='Confusion matrix',
+                          title='CM',
                           cmap=plt.cm.Blues):
     """
     This function prints and plots the confusion matrix.
@@ -19,7 +20,7 @@ def plot_confusion_matrix(cm, classes,
     """
     if normalize:
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-
+    plt.figure(figsize=(15,6))
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)
     plt.colorbar()
@@ -36,4 +37,6 @@ def plot_confusion_matrix(cm, classes,
 
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
+    plt.figure(figsize=(15,6))
     plt.show()   
+   
