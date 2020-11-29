@@ -10,10 +10,10 @@ import matplotlib.pyplot as plt
 from prepare_data import *
 
 DATA_PATH = "../data_out/rawdata2.csv"
-SAVED_MODEL_PATH = "../data_out/modeles/nnet.h5"
-EPOCHS = 300
+SAVED_MODEL_PATH = "../data_out/nnet.h5"
+EPOCHS = 70
 PATIENCE = 20
-LEARNING_RATE = 0.001
+LEARNING_RATE = 0.0001
 
 
 def build_model(input_shape, loss="categorical_crossentropy", learning_rate=0.0001):
@@ -28,16 +28,18 @@ def build_model(input_shape, loss="categorical_crossentropy", learning_rate=0.00
     # LE réseau
 
     inp=Input(shape=(input_shape,))
-    model = Dense(500,activation='relu')(inp)
+    model = Dense(1024,activation='relu')(inp)
     model = Dropout(0.3)(model)
-    model = Dense(8000,activation='relu')(model)
+    model = Dense(512,activation='relu')(model)
     model = Dropout(0.2)(model)
-    model = Dense(4000,activation='relu')(model)
+    model = Dense(256,activation='relu')(model)
     model = Dropout(0.2)(model)
-    model = Dense(2000,activation='relu')(model)
+    model = Dense(128,activation='relu')(model)
     model = Dropout(0.2)(model)
-    model = Dense(1000,activation='relu')(model)
-    model = Dense(500,activation='relu')(model)
+    model = Dense(64,activation='relu')(model)
+    model = Dropout(0.2)(model)
+    model = Dense(32,activation='relu')(model)
+    model = Dropout(0.2)(model)
     model = Dense(10,activation='softmax')(model)
 
     model = Model(inputs=inp,outputs=model)
