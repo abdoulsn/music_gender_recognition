@@ -14,7 +14,7 @@ from prepare_data import *
 DATA_PATH = "../data_out/rawdata.csv"
 SAVED_MODEL_PATH = "../data_out/modeles/nnet.h5"
 EPOCHS = 300
-PATIENCE = 10
+PATIENCE = 20
 LEARNING_RATE = 0.001
 
 
@@ -53,7 +53,7 @@ def build_model(input_shape, loss="categorical_crossentropy", learning_rate=0.00
     return model
 
 
-def train(model, epochs, patience, x_train, y_train, x_validation, y_validation):
+def train(model, epochs, patience, x_train, y_train):
     """ apprentisage
     : param epochs (int): nbre d'itérations d'apprentissage
     : param patience (int): Nombre d'époques à attendre avant l'arrêt anticipé, s'il n'y a pas d'amélioration de la
@@ -65,12 +65,14 @@ def train(model, epochs, patience, x_train, y_train, x_validation, y_validation)
 
     : return history et model: historique d'entraînement
     """
-    earlystop_callback = tf.keras.callbacks.EarlyStopping(monitor="accuracy", min_delta=0.0001, patience=patience)
+    # earlystop_callback = tf.keras.callbacks.EarlyStopping(monitor="accuracy", min_delta=0.0001, patience=)
 
     # train model
+    lr=tf.keras.callbacks.ReduceLROnPlateau(monitor='accuracy',factor=0.5,patience=3,verbose=1)
+    es=tf.keras.callbacks.EarlyStopping(monitor='accuracy',patience=patience,verbose=1)
     history = model.fit(x_train, y_train, epochs=epochs,
                         validation_split = .05,
-                        callbacks=[earlystop_callback])
+                        callbacks=[lr, es])
 
     return history, model
 
@@ -115,7 +117,7 @@ def run_model():
     input_shape=x_train.shape[1]
     model = build_model(input_shape, learning_rate=LEARNING_RATE)
     # apprentisage network
-    history, model = train(model, EPOCHS, PATIENCE, x_train, y_train, x_validation, y_validation)
+    history, model = train(model, EPOCHS, PATIENCE, x_train, y_train) #, x_validation, y_validation)
     # plot accuracy/loss
     plot_history(history)
 
