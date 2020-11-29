@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from prepare_data import *
 
 DATA_PATH = "../data_out/rawdata2.csv"
-SAVED_MODEL_PATH = "../data_out/nnet.h5"
+SAVED_MODEL_PATH = "../modeles/nnet.h5"
 EPOCHS = 70
 PATIENCE = 20
 LEARNING_RATE = 0.0001
