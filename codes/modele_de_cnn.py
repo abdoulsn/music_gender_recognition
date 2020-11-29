@@ -5,8 +5,6 @@ import numpy as np
 import pandas as pd
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Dense,Dropout,Input
-import tensorflow.keras as keras
-from sklearn.metrics import confusion_matrix
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from prepare_data import *
@@ -49,24 +47,22 @@ def build_model(input_shape, loss="categorical_crossentropy", learning_rate=0.00
 
     # print summary du modèle
     model.summary()
-
     return model
 
 
 def train(model, epochs, patience, x_train, y_train):
     """ apprentisage
-    : param epochs (int): nbre d'itérations d'apprentissage
-    : param patience (int): Nombre d'époques à attendre avant l'arrêt anticipé, s'il n'y a pas d'amélioration de la
-        précision
-    : param x_train (ndarray): Entrées pour la df X
-    : param y_train (ndarray): Cibles pour la df Y
-    : param X_validation (ndarray): Entrées pour l'ensemble de validation
-    : param y_validation (ndarray): Cibles pour l'ensemble de validation
+        : param epochs (int): nbre d'itérations d'apprentissage
+        : param patience (int): Nombre d'époques à attendre avant l'arrêt anticipé,
+            s'il n'y a pas d'amélioration de la
+            précision
+        : param x_train (ndarray): Entrées pour la df X
+        : param y_train (ndarray): Cibles pour la df Y
+        : param X_validation (ndarray): Entrées pour l'ensemble de validation
+        : param y_validation (ndarray): Cibles pour l'ensemble de validation
 
-    : return history et model: historique d'entraînement
+        : return history et model: historique d'entraînement
     """
-    # earlystop_callback = tf.keras.callbacks.EarlyStopping(monitor="accuracy", min_delta=0.0001, patience=)
-
     # train model
     lr=tf.keras.callbacks.ReduceLROnPlateau(monitor='accuracy',factor=0.5,patience=3,verbose=1)
     es=tf.keras.callbacks.EarlyStopping(monitor='accuracy',patience=patience,verbose=1)
