@@ -9,7 +9,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from prepare_data import *
 
-DATA_PATH = "../data_out/rawdata2.csv"
+DATA_PATH = "../data_out/raw_data.csv"
 SAVED_MODEL_PATH = "../modeles/nnet.h5"
 EPOCHS = 70
 PATIENCE = 20
